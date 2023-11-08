@@ -1,4 +1,4 @@
-texto,cypher
-"¿Quiénes son los actores en la película ""Titanic""?",MATCH (m:Movie {title:"Titanic"})<-[:ACTED_IN]-(a:Person) RETURN a.name
-"¿Cuántas películas ha dirigido Christopher Nolan?",MATCH (d:Person {name:"Christopher Nolan"})-[:DIRECTED]->(m:Movie) RETURN COUNT(m)
-"¿En qué películas ha actuado Tom Hanks?",MATCH (p:Person {name:"Tom Hanks"})-[:ACTED_IN]->(m:Movie) RETURN m.title
+text,cypher
+"电影《Titanic》里的演员是谁？",MATCH (m:Movie {title:"Titanic"})<-[:ACTED_IN]-(a:Person) RETURN a.name
+"克里斯托弗·诺兰导演了多少部电影?",MATCH (d:Person {name:"克里斯托弗·诺兰"})-[:DIRECTED]->(m:Movie) RETURN COUNT(m)
+"汤姆·汉克斯演过哪些电影?",MATCH (p:Person {name:"汤姆·汉克斯"})-[:ACTED_IN]->(m:Movie) RETURN m.title

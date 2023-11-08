@@ -2,7 +2,7 @@ import tensorflow as tf
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-# Cargar los datos de entrenamiento y prueba
+# 加载训练和测试数据
 def obtener_datos_entrenamiento():
     datos = pd.read_csv("data/datos_entrenamiento.csv")
     train = datos.sample(frac=0.8,random_state=200)
@@ -17,18 +17,18 @@ datos_entrenamiento["cypher"] = le.fit_transform(datos_entrenamiento["cypher"])
 datos_entrenamiento["cypher"] = tf.keras.utils.to_categorical(datos_entrenamiento["cypher"])
 datos_prueba["cypher"] = tf.keras.utils.to_categorical(datos_prueba["cypher"])
 
-# Preprocesar los datos
+# 预处理数据
 tokenizer = tf.keras.preprocessing.text.Tokenizer()
 tokenizer.fit_on_texts(datos_entrenamiento['texto'])
 datos_entrenamiento_tokens = tokenizer.texts_to_sequences(datos_entrenamiento['texto'])
 datos_prueba_tokens = tokenizer.texts_to_sequences(datos_prueba['texto'])
 
-# Añadir padding a las secuencias de tokens
+# 向令牌序列添加填充
 MAXLEN = 50
 datos_entrenamiento_tokens_padded = tf.keras.preprocessing.sequence.pad_sequences(datos_entrenamiento_tokens, maxlen=MAXLEN, padding='post')
 datos_prueba_tokens_padded = tf.keras.preprocessing.sequence.pad_sequences(datos_prueba_tokens, maxlen=MAXLEN, padding='post')
 
-# Definir el modelo
+# 定义模型
 model = tf.keras.models.Sequential([
   tf.keras.layers.Embedding(len(tokenizer.word_index) + 1, 128, input_length=MAXLEN),
   tf.keras.layers.LSTM(128),
@@ -36,12 +36,12 @@ model = tf.keras.models.Sequential([
   tf.keras.layers.Dense(len(tokenizer.word_index) + 1, activation='softmax')
 ])
 
-# Compilar el modelo
+# 编译模型
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
 
-# Entrenar el modelo
+# 训练模型
 model.fit(datos_entrenamiento_tokens_padded, datos_entrenamiento['cypher'], epochs=10, validation_data=(datos_prueba_tokens_padded, datos_prueba['cypher']))
 
-# Guardar el modelo
+# 保存模型
 model.save('modelo_de_lenguaje_natural.h5')
 

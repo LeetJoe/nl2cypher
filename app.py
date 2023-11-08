@@ -3,70 +3,69 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-# Cargar el modelo de lenguaje natural entrenado
+# 加载训练有素的自然语言模型
 model = tf.keras.models.load_model('modelo_de_lenguaje_natural.h5')
 
 app = Flask(__name__)
 
-# Definir una ruta que acepte una consulta en lenguaje natural como entrada
+# 定义接受自然语言查询作为输入的路径
 @app.route('/convertir_a_cypher', methods=['POST'])
 def convertir_a_cypher():
-    # Obtener la consulta en lenguaje natural del cuerpo de la solicitud
+    # 获取请求体的自然语言查询
     consulta = request.json['consulta']
 
-    # Preprocesar la consulta
+    # 预处理查询
     consulta_preprocesada = preprocesar_consulta(consulta)
 
-    # Usar el modelo de lenguaje natural para generar la consulta en Cypher
+    # 使用自然语言模型在Cypher中生成查询
     consulta_cypher = generar_consulta_cypher(consulta_preprocesada)
 
-    # Devolver la consulta en Cypher como respuesta
+    # 在Cypher中返回查询作为响应
     return {'consulta_cypher': consulta_cypher}
 
-# Función para preprocesar la consulta en lenguaje natural
+# 用自然语言预处理查询的函数
 def preprocesar_consulta(consulta, tokenizer, max_length):
     """
-    Preprocesa la consulta y la convierte en una representación numérica
-    que puede ser procesada por Tensorflow.
+    预处理查询并将其转换为数字表示
+    可以用张量流处理。
 
     Args:
-        consulta (str): La consulta en lenguaje natural.
-        tokenizer (Tokenizer): El tokenizer que se usará para convertir la consulta
-            en una representación numérica.
-        max_length (int): La longitud máxima de la secuencia numérica de la consulta.
+        consulta (str): 自然语言查询。
+        tokenizer (Tokenizer): 将用于转换查询的标记化器
+            用数字表示。
+        max_length (int): 查询数字序列的最大长度。
 
     Returns:
-        numpy array: Una matriz de forma (1, max_length) que representa la consulta
+        numpy array: 表示查询的形状数组(1,max_length)
         preprocesada.
 
     """
-    # Tokenizar la consulta
+    # Tokenizar 咨询
     consulta_tokens = tokenizer.texts_to_sequences([consulta])
     
-    # Paddear la secuencia numérica para que tenga longitud fija
+    # 调整数字序列，使其具有固定长度
     consulta_padded = pad_sequences(consulta_tokens, maxlen=max_length, padding='post', truncating='post')
     
     return np.array(consulta_padded)
 
-# Función para generar la consulta en Cypher usando el modelo de lenguaje natural
+# 使用自然语言模型在Cypher中生成查询的函数
 def generar_consulta_cypher(modelo, preprocesador, consulta):
     """
-    Genera una consulta Cypher a partir de la salida del modelo de Tensorflow.
+    从Tensorflow模型的输出生成一个Cypher查询。
 
     Args:
-        modelo (tensorflow.keras.Model): El modelo que se utilizará para generar la consulta Cypher.
-        preprocesador (callable): La función que se utilizará para preprocesar la consulta antes de enviarla
-            al modelo.
-        consulta (str): La consulta en lenguaje natural.
+        modelo (tensorflow.keras.Model): 用于生成Cypher查询的模型。
+        preprocesador (callable): 在发送查询之前用于预处理查询的函数 模式。
+        consulta (str): 自然语言查询。
 
     Returns:
-        str: Una cadena que representa la consulta Cypher generada por el modelo.
+        str: 表示模型生成的Cypher查询的字符串。
 
     """
-    # Preprocesar la consulta
+    # 预处理查询
     consulta_procesada = preprocesador(consulta)
     
-    # Generar la consulta Cypher a partir de la salida del modelo
+    # 从模型输出生成Cypher查询
     output = modelo.predict(consulta_procesada)
     output = np.argmax(output, axis=-1)
     cypher = ''.join([preprocesador.get_word_index()[w] for w in output[0] if w != 0])
