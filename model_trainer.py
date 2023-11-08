@@ -13,15 +13,16 @@ datos_entrenamiento, datos_prueba = obtener_datos_entrenamiento()
 
 le = LabelEncoder()
 datos_entrenamiento["cypher"] = le.fit_transform(datos_entrenamiento["cypher"])
-
 datos_entrenamiento["cypher"] = tf.keras.utils.to_categorical(datos_entrenamiento["cypher"])
+
+datos_prueba["cypher"] = le.fit_transform(datos_prueba["cypher"])
 datos_prueba["cypher"] = tf.keras.utils.to_categorical(datos_prueba["cypher"])
 
 # 预处理数据
 tokenizer = tf.keras.preprocessing.text.Tokenizer()
-tokenizer.fit_on_texts(datos_entrenamiento['texto'])
-datos_entrenamiento_tokens = tokenizer.texts_to_sequences(datos_entrenamiento['texto'])
-datos_prueba_tokens = tokenizer.texts_to_sequences(datos_prueba['texto'])
+tokenizer.fit_on_texts(datos_entrenamiento['text'])
+datos_entrenamiento_tokens = tokenizer.texts_to_sequences(datos_entrenamiento['text'])
+datos_prueba_tokens = tokenizer.texts_to_sequences(datos_prueba['text'])
 
 # 向令牌序列添加填充
 MAXLEN = 50
